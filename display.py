@@ -17,19 +17,37 @@ xd, yd = m.screen_size()
 def nothing(x):
 	pass
 
-#ordered TL, TR, BL, BR 
-scr = np.array([
-	[168, 78],
-	[259,90],
-	[154,130],
-	[242,134]],dtype="float32")
+print("before soup")
+scr=np.array([[0.,0.],[0.,0.],[0.,0.],[0.,0.]],dtype="float32")
+loc_file=open("perspective_transform.txt","r")
+strang=loc_file.readlines() #this returns a list, like ['0 0', '0 50'...]
+#I suppose this takes the first line############################here
+p = 0
+for i in strang:
+	soup=i.split()
+	loop=[float(soup[0]), float(soup[1])]
+	print(i)
+	print(soup)
+	print(loop[0]+loop[1]) 
+	scr[p][0] += int(soup[0])
+	scr[p][1] += int(soup[1])
+	p+=1
 
+loc_file.close()
+print("aftersoup")
+#ordered TL, TR, BL, BR 
+#scr = np.array([
+#	[168, 78],
+#	[259,90],
+#	[154,130],
+#	[242,134]],dtype="float32")
+print(scr)
 dst = np.array([
 	[0,0],
 	[639,0],
 	[0,479],
 	[639,479]], dtype="float32")
-
+print(dst)
 wer = cv2.getPerspectiveTransform(scr,dst)
 
 #numpyL = np.array([0,0,150])
@@ -46,6 +64,7 @@ cv2.createTrackbar("Lower: S", "Calibration", numpyL[1], 255, nothing)
 cv2.createTrackbar("Upper: S", "Calibration", numpyH[1], 255, nothing)
 cv2.createTrackbar("Lower: V", "Calibration", numpyL[2], 255, nothing)
 cv2.createTrackbar("Upper: V", "Calibration", numpyH[2], 255, nothing)
+cv2.moveWindow("Calibration", 0, 0)
 
 def click(x, y, w, h):
 	#this is supposed to take a point and translate it into window space
