@@ -26,9 +26,9 @@ p = 0
 for i in strang:
 	soup=i.split()
 	loop=[float(soup[0]), float(soup[1])]
-	print(i)
-	print(soup)
-	print(loop[0]+loop[1]) 
+	#print(i)
+	#print(soup)
+	#print(loop[0]+loop[1]) 
 	scr[p][0] += int(soup[0])
 	scr[p][1] += int(soup[1])
 	p+=1
@@ -68,14 +68,6 @@ color_file.close()
 print("not so soupy :(")
 print(numpyL)
 print(numpyH)
-'''cv2.namedWindow("Calibration", 0)
-cv2.createTrackbar("Lower: H", "Calibration", numpyL[0], 179, nothing)
-cv2.createTrackbar("Upper: H", "Calibration", numpyH[0], 179, nothing)
-cv2.createTrackbar("Lower: S", "Calibration", numpyL[1], 255, nothing)
-cv2.createTrackbar("Upper: S", "Calibration", numpyH[1], 255, nothing)
-cv2.createTrackbar("Lower: V", "Calibration", numpyL[2], 255, nothing)
-cv2.createTrackbar("Upper: V", "Calibration", numpyH[2], 255, nothing)
-cv2.moveWindow("Calibration", 0, 0)'''
 
 def click(x, y, w, h):
 	#this is supposed to take a point and translate it into window space
@@ -171,15 +163,6 @@ while True:
 			#this means there is a blob compared to last time
 		else:
 			frame_on = 0
-
-	'''LH = cv2.getTrackbarPos("Lower: H", "Calibration")
-	UH = cv2.getTrackbarPos("Upper: H", "Calibration")
-	LS = cv2.getTrackbarPos("Lower: S", "Calibration")
-	US = cv2.getTrackbarPos("Upper: S", "Calibration")
-	LV = cv2.getTrackbarPos("Lower: V", "Calibration")
-	UV = cv2.getTrackbarPos("Upper: V", "Calibration")
-	numpyL = np.array([LH,LS,LV])
-	numpyH = np.array([UH,US,UV])'''
 
 	cv2.imshow("Frame", image)
 	cv2.imshow("Mask", mask)

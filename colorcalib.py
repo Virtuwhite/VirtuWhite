@@ -6,8 +6,12 @@ import cv2
 import numpy as np
 import sys
 
-def nothing(x):
+last_track = "Lower: H"
+def last(x):
 	pass
+#I need to get the name of the trackbar last used, possible to achieve
+#without having to use different functions for all?
+#use last_track to enable the [ and ] feature
 
 #usual IR
 #numpyL = np.array([0,0,150])
@@ -78,7 +82,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 
 	if key==ord('q'):
 		break
-
+	elif key==ord('['):
+		#make it go down 5?
+		#make it for the last uh--bar selected
+	elif key==ord(']'):
+		#make it go up 5
 print("after loop")
 #vs.stop()
 cv2.destroyAllWindows()
