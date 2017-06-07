@@ -54,17 +54,28 @@ wer = cv2.getPerspectiveTransform(scr,dst)
 #numpyH = np.array([130,255,255])
 	
 #yellow
-numpyL = np.array([15,100,100])
-numpyH = np.array([45,255,255])		
-
-cv2.namedWindow("Calibration", 0)
+#numpyL = np.array([15,100,100])
+#numpyH = np.array([45,255,255])		
+print("soupy!")
+#I'm supposed to read from the file that's it
+color_file=open("color.txt","r")
+colon_cancer=color_file.readlines() #I want to die?
+n1=colon_cancer[0].split()
+n2=colon_cancer[1].split()
+numpyL=np.array([int(n1[0]),int(n1[1]),int(n1[2])])
+numpyH=np.array([int(n2[0]),int(n2[1]),int(n2[2])])
+color_file.close()
+print("not so soupy :(")
+print(numpyL)
+print(numpyH)
+'''cv2.namedWindow("Calibration", 0)
 cv2.createTrackbar("Lower: H", "Calibration", numpyL[0], 179, nothing)
 cv2.createTrackbar("Upper: H", "Calibration", numpyH[0], 179, nothing)
 cv2.createTrackbar("Lower: S", "Calibration", numpyL[1], 255, nothing)
 cv2.createTrackbar("Upper: S", "Calibration", numpyH[1], 255, nothing)
 cv2.createTrackbar("Lower: V", "Calibration", numpyL[2], 255, nothing)
 cv2.createTrackbar("Upper: V", "Calibration", numpyH[2], 255, nothing)
-cv2.moveWindow("Calibration", 0, 0)
+cv2.moveWindow("Calibration", 0, 0)'''
 
 def click(x, y, w, h):
 	#this is supposed to take a point and translate it into window space
@@ -74,12 +85,12 @@ def drag(x,y,w,h):
 	m.drag((x * xd / w),(y * yd / h))
 
 # construct the argument parse and parse the arguments
-ap = argparse.ArgumentParser()
+'''ap = argparse.ArgumentParser()
 ap.add_argument("-n", "--num-frames", type=int, default=100,
 	help="num of frames to loop over for FPS test")
 ap.add_argument("-d", "--display", type=int, default=-1,
 	help="Whether or not frames should be displayed")
-args = vars(ap.parse_args())
+args = vars(ap.parse_args())'''
  
 # initialize the camera and stream
 #camera = PiCamera()
@@ -161,14 +172,14 @@ while True:
 		else:
 			frame_on = 0
 
-	LH = cv2.getTrackbarPos("Lower: H", "Calibration")
+	'''LH = cv2.getTrackbarPos("Lower: H", "Calibration")
 	UH = cv2.getTrackbarPos("Upper: H", "Calibration")
 	LS = cv2.getTrackbarPos("Lower: S", "Calibration")
 	US = cv2.getTrackbarPos("Upper: S", "Calibration")
 	LV = cv2.getTrackbarPos("Lower: V", "Calibration")
 	UV = cv2.getTrackbarPos("Upper: V", "Calibration")
 	numpyL = np.array([LH,LS,LV])
-	numpyH = np.array([UH,US,UV])
+	numpyH = np.array([UH,US,UV])'''
 
 	cv2.imshow("Frame", image)
 	cv2.imshow("Mask", mask)
@@ -179,9 +190,9 @@ while True:
 		break
 	elif key == ord('m'):
 		maus = not maus
-	elif key == ord('c'): #c for calibrate
+	#elif key == ord('c'): #c for calibrate
 		#I suppose you enter a calibration state?
-		calibration = not calibration
+		#calibration = not calibration
 
 vs.stop()
 cv2.destroyAllWindows()
