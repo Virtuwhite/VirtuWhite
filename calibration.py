@@ -6,7 +6,6 @@ import cv2
 import numpy as np
 from pymouse import PyMouse
 
-
 #perspective_transform stores the points according to (top left, top right
 #	bottom right, bottom left)
 open('perspective_transform.txt','w').close()
@@ -14,11 +13,23 @@ open('perspective_transform.txt','w').close()
 xd, yd = PyMouse().screen_size()
 print("%d %d"%(xd,yd))
 #infrared??
-numpyL = np.array([0,0,150])
-numpyH = np.array([130,255,255])
-
+#gotta change these to accomodate for the 
+print("Soupy appears in calibration! >:D")
+#numpyL = np.array([0,0,150])
+#numpyH = np.array([130,255,255])
+numpyL=np.array([0,0,0])
+numpyH=np.array([0,0,0])
+file=open("color.txt","r")
+list_of_things=file.readlines()
+n1=list_of_things[0].split()
+n2=list_of_things[1].split()
+for i in range(3):
+	numpyL[i]=int(n1[i])
+	numpyH[i]=int(n2[i])
+file.close()
 print("Let me rest in peace")
-vs = PiVideoStream(resolution=(640,480)).start()
+
+#vs = PiVideoStream(resolution=(640,480)).start()
 params=cv2.SimpleBlobDetector_Params()
 
 params.minThreshold=220
