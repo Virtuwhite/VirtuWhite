@@ -1,11 +1,12 @@
 #import packages to run the color calibration
-#from  imutils.video.pivideostream import PiVideoStream
-#import imutils
-from picamera.array import PiRGBArray
-from picamera import PiCamera
+from  imutils.video.pivideostream import PiVideoStream
+import imutils
+#from picamera.array import PiRGBArray
+#from picamera import PiCamera
 import time
 import cv2
 import numpy as np
+import sys
 
 def nothing(x):
 	pass
@@ -15,14 +16,23 @@ def nothing(x):
 #numpyH = np.array([130,255,255])
 
 #yellow
-numpyL = np.array([15,100,100])
-numpyH = np.array([45,255,255])
+numpyL = np.array([0,0,0])
+numpyH = np.array([0,0,0])
 #we should have these read from a file
+
 print("I am soupy")
 file=open("color.txt","r")
 list_of_things=file.readlines()
+p=0
+n1=list_of_things[0].split()
+n2=list_of_things[1].split()
+for i in range(3):
+	numpyL[i]=int(n1[i])
+	numpyH[i]=int(n2[i])
+file.close()
 #should return a list like [0,3,25] etc
-
+print(numpyL)
+print(numpyH)
 print("I am not soupy anymore :(")
 cv2.namedWindow("Calibration", 0)
 cv2.createTrackbar("Lower: H", "Calibration", numpyL[0], 179, nothing)
@@ -34,14 +44,17 @@ cv2.createTrackbar("Upper: V", "Calibration", numpyH[2], 255, nothing)
 cv2.moveWindow("Calibration", 0,0)
 
 print("lemmedie")
-#vs=PiVideoStream().start()
+vs=PiVideoStream().start()
 #oh I don't need params :))))
-camera = PiCamera()
-camera.resolution=(640,480)
-camera.framerate=50
-rawCapture=PiRGBArray(camera,size=(640,480))
+print("before camera")
+#camera = PiCamera()
+#camera.resolution=(640,480)
+#camera.framerate=32
+#rawCapture=PiRGBArray(camera,size=(640,480))
 time.sleep(1.0)
+print("after cam before loop")
 
+#for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 while True:
 	image = vs.read()
 	hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
@@ -67,3 +80,8 @@ while True:
 
 vs.stop()
 cv2.destroyAllWindows()
+open("color.txt","w").close() #supposed to clear out the file but idk?
+working_file=open("color.txt","w")
+working_file.write("%d %d %d\n"%(numpyL[0],numpyL[1],numpyL[2]))
+working_file.write("%d %d %d\n"%(numpyH[0],numpyH[1],numpyH[2]))
+working_file.close()
