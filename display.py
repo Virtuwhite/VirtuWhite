@@ -45,8 +45,8 @@ print(scr)
 dst = np.array([
 	[0,0],
 	[639,0],
-	[0,479],
-	[639,479]], dtype="float32")
+	[639,479],
+	[0,479]], dtype="float32")
 print(dst)
 wer = cv2.getPerspectiveTransform(scr,dst)
 
@@ -66,6 +66,7 @@ numpyL=np.array([int(n1[0]),int(n1[1]),int(n1[2])])
 numpyH=np.array([int(n2[0]),int(n2[1]),int(n2[2])])
 color_file.close()
 print("not so soupy :(")
+print("-----------------------")
 print(numpyL)
 print(numpyH)
 
@@ -93,16 +94,11 @@ args = vars(ap.parse_args())'''
 #	use_video_port=True)
 
 print("Let's try something!")
-vs = PiVideoStream().start()#resolution=(640,480)).start()
-print("Is it failing here?")
 params = cv2.SimpleBlobDetector_Params()
-
 params.minThreshold = 220
 params.maxThreshold = 255
 params.blobColor = 255
-params.filterByArea = True
-params.minArea = 5
-#params.maxArea = 20
+params.filterByArea = False
 params.filterByCircularity = False
 params.filterByConvexity = False
 params.filterByInertia = True
@@ -114,10 +110,10 @@ if int(version[0]) < 3 :
 else:
 	detector = cv2.SimpleBlobDetector_create(params)
 
+vs = PiVideoStream().start()#resolution=(640,480)).start()
 time.sleep(2.0)
-maus = True #When it's true, cam tracks IR pen, when false, only comp mouse
-calibration = False
 
+maus = True #When it's true, cam tracks IR pen, when false, only comp mouse
 #detecting whether it is a mouse click or a mouse drag
 frame_on = 0
 
@@ -133,13 +129,13 @@ while True:
 	pers = cv2.warpPerspective(image, wer, (640,480))	
 
 	mask = cv2.inRange(hsv, numpyL, numpyH)
-	mask = cv2.erode(mask, None, iterations=2)
-	mask = cv2.dilate(mask, None, iterations=4)
+	#mask = cv2.erode(mask, None, iterations=2)
+	#mask = cv2.dilate(mask, None, iterations=4)
 	
 	if maus == True:
 		keypts = detector.detect(mask)
 		bro = len(keypts)
-		print("Length of kpts: %d" % bro)
+		#print("Length of kpts: %d" % bro)
 		'''for kp in  keypts:
 			cv2.circle(image, (int(kp.pt[0]), int(kp.pt[1])), int(kp.size),(0,0,255))
 			print("Locations: (%d, %d)" % (int(kp.pt[0]), int(kp.pt[1])))
@@ -150,6 +146,7 @@ while True:
 
 		#bro is the number of keypoits there are
 		if bro > 0:
+			print("Length of kpts: %d" % bro)
 			#pt = keypts[0]
 			x = keypts[0].pt[0]
 			y = keypts[0].pt[1]
@@ -173,6 +170,12 @@ while True:
 		break
 	elif key == ord('m'):
 		maus = not maus
+	'''elif key==ord('h'):
+		print("horizontal flip!")
+		vs.hflip()
+	elif key==ord('v'):
+		print("vertical flip!")
+		vs.vflip()'''
 	#elif key == ord('c'): #c for calibrate
 		#I suppose you enter a calibration state?
 		#calibration = not calibration

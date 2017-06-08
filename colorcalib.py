@@ -36,35 +36,54 @@ print(numpyL)
 print(numpyH)
 print("I am not soupy anymore :(")
 cv2.namedWindow("Calibration", 0)
-cv2.createTrackbar("Lower: H", "Calibration", numpyL[0], 179, nothing)
-cv2.createTrackbar("Upper: H", "Calibration", numpyH[0], 179, nothing)
-cv2.createTrackbar("Lower: S", "Calibration", numpyL[1], 255, nothing)
-cv2.createTrackbar("Upper: S", "Calibration", numpyH[1], 255, nothing)
-cv2.createTrackbar("Lower: V", "Calibration", numpyL[2], 255, nothing)
-cv2.createTrackbar("Upper: V", "Calibration", numpyH[2], 255, nothing)
+cv2.createTrackbar("Lower: H", "Calibration", numpyL[0], 179, last)
+cv2.createTrackbar("Upper: H", "Calibration", numpyH[0], 179, last)
+cv2.createTrackbar("Lower: S", "Calibration", numpyL[1], 255, last)
+cv2.createTrackbar("Upper: S", "Calibration", numpyH[1], 255, last)
+cv2.createTrackbar("Lower: V", "Calibration", numpyL[2], 255, last)
+cv2.createTrackbar("Upper: V", "Calibration", numpyH[2], 255, last)
 cv2.moveWindow("Calibration", 0,0)
+
+params=cv2.SimpleBlobDetector_Params()
+params.minThreshold=220
+params.maxThreshold=255
+params.blobColor=255
+params.filterByArea=False
+params.filterByCircularity=False
+params.filterByConvexity=False
+params.filterByInertia=True
+params.minInertiaRatio=0.01
+
+version=(cv2.__version__).split('.')
+if int(version[0]) < 3:
+	detector=cv2.SimpleBlobDetector(params)
+else:
+	detector=cv2.SimpleBlobDetector_create(params)
 
 print("lemmedie")
 #vs=PiVideoStream().start()
 #oh I don't need params :))))
 print("before camera")
 camera = PiCamera()
-camera.resolution=(640,480)
+camera.resolution=(320,240)
 camera.framerate=32
-rawCapture=PiRGBArray(camera,size=(640,480))
+rawCapture=PiRGBArray(camera,size=(320,240))
 time.sleep(1.0)
 print("after cam before loop")
 
 for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True):
 #while True:
 	#image = vs.read()
-	print("before frame hi")
+	#print("before frame hi")
 	image = frame.array
 	hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 	
 	mask = cv2.inRange(hsv, numpyL, numpyH)
-	mask = cv2.erode(mask, None, iterations=2)
-	mask = cv2.dilate(mask, None, iterations=4)
+	#mask = cv2.erode(mask, None, iterations=2)
+	#mask = cv2.dilate(mask, None, iterations=4)
+	keypts=detector.detect(mask)
+	if len(keypts) > 0:
+		print("number of pts detected: %d" % len(keypts))
 
 	LH = cv2.getTrackbarPos("Lower: H", "Calibration")
 	UH = cv2.getTrackbarPos("Upper: H", "Calibration")
@@ -83,9 +102,11 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 	if key==ord('q'):
 		break
 	elif key==ord('['):
+		print("[ key pressed!")
 		#make it go down 5?
 		#make it for the last uh--bar selected
 	elif key==ord(']'):
+		print("] key pressed!")
 		#make it go up 5
 print("after loop")
 #vs.stop()

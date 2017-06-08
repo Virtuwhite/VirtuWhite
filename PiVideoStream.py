@@ -15,6 +15,8 @@ class PiVideoStream:
 		self.stream = self.camera.capture_continuous(self.rawCapture,
 			format="bgr", use_video_port=True)
  
+		self.camera.hflip=False
+		self.camera.vflip=False
 		# initialize the frame and the variable used to indicate
 		# if the thread should be stopped
 		self.frame = None
@@ -41,6 +43,12 @@ class PiVideoStream:
 				self.rawCapture.close()
 				self.camera.close()
 				return
+
+	def hflip(self):
+		self.camera.hflip= !self.camera.hflip
+	
+	def vflip(self):
+		self.camera.vflip= !self.camera.vflip
 
 	def read(self):
 		# return the frame most recently read

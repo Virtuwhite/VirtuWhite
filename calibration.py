@@ -31,6 +31,11 @@ file.close()
 print("Let me rest in peace")
 print(numpyL)
 print(numpyH)
+
+img=np.zeros((100,600,3),np.uint8)
+cv2.putText(img,'Touch in the order: Top Left, Top Right, Bottom Right, Bottom Left of your entire display', (10,50),cv2.FONT_HERSHEY_SIMPLEX,0.4,(255,255,255),1,cv2.LINE_AA)
+cv2.imshow("instructions", img)
+
 vs = PiVideoStream().start()#(resolution=(640,480)).start()
 params=cv2.SimpleBlobDetector_Params()
 
@@ -58,6 +63,8 @@ Pts=([[0,0],
 	[50,50]]) #default points
 i = 0
 print("made it here")
+print("You want to touch in the order of TL, TR, BR, BL")
+print("Hope to change this in the future, probably with flip commands and such maybe! Look into camera flipping how do")
 while i < 4:
 	#print("I am in the loop, why am I not being read though")
 	image = vs.read()
@@ -87,9 +94,28 @@ vs.stop()
 cv2.destroyAllWindows()
 #so Pts should have in the order TL, TR, BR, BL points
 #You gotta store these in uhh... a file somewhere
-print("Is this where it fails?")
+
+#so you probably have points stored in TL, TR, BR, BL but some
+#people are dumb fucks and can't figure anything out
+#(I'll need to double check stuff about the hflip and vflip
+#usually with the first 2 points you can figure out the orientation of
+#the camera--and thus can shuffle the  points accordingly
+
+#how does hflip and vflip work actually, under the presumption that
+#the camera is rotated at some angle, can the camera be resorted
+#hRGHGHFJSFHD this is hard how do you determine whether something is on the
+#same axis as you and not on the diagonal axis?
+#you can separate the points into 2 groups, the first 2 & the last 2
+#the order the 1st 2 have demonstrate the general axis the 2nd 2 
+#should have??
+#MAN IDK geometry is hard :(
+
+#deltax = Pts[1][0] - Pts[0][0] 
+#deltay = Pts[1][1] - Pts[0][1]
+
+
+
 working_file=open('perspective_transform.txt','w')
-print("here?")
 for i in range(len(Pts)):
 	working_file.write("%d %d\n"%(Pts[i][0], Pts[i][1]))
 print("????")
