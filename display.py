@@ -151,6 +151,11 @@ while True:
 			x = keypts[0].pt[0]
 			y = keypts[0].pt[1]
 			print("%d %d" % (x, y))
+			dst=np.array([0,0,1])
+			src=np.array([x,y,1])
+			cv2.perspectiveTransform(src,dst,wer)
+			#The problem is here, src+1==m.cols in fn perspectivetransofmr
+
 			if frame_on == 0:
 				click(int(x),int(y),width,height)
 				frame_on = frame_on + 1
