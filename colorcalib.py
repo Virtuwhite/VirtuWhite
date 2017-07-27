@@ -95,6 +95,7 @@ for frame in camera.capture_continuous(rawCapture, format="bgr", use_video_port=
 	numpyH = np.array([UH, US, UV])
 
 	cv2.imshow("Frame",image)
+	cv2.imshow("HSV",hsv)
 	cv2.imshow("Mask", mask)
 	rawCapture.truncate(0)
 	key = cv2.waitKey(1) & 0xFF

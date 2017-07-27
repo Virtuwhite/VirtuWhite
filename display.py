@@ -35,7 +35,12 @@ for i in strang:
 
 loc_file.close()
 print("aftersoup")
-#ordered TL, TR, BL, BR 
+minx = min(scr[0][0],scr[1][0],scr[2][0],scr[3][0])
+maxx = max(scr[0][0],scr[1][0],scr[2][0],scr[3][0])
+miny = min(scr[0][1],scr[1][1],scr[2][1],scr[3][1])
+maxy = max(scr[0][1],scr[1][1],scr[2][1],scr[3][1])
+
+	#ordered TL, TR, BL, BR 
 #scr = np.array([
 #	[168, 78],
 #	[259,90],
@@ -72,10 +77,10 @@ print(numpyH)
 
 def click(x, y, w, h):
 	#this is supposed to take a point and translate it into window space
-	m.move((x * xd / w),(y * yd / h))
+	m.click((x * xd / w)/2,(y * yd / h)/2)
 
 def drag(x,y,w,h):
-	m.drag((x * xd / w),(y * yd / h))
+	m.drag((x * xd / w)/2,(y * yd / h)/2)
 
 # construct the argument parse and parse the arguments
 '''ap = argparse.ArgumentParser()
@@ -114,23 +119,15 @@ vs = PiVideoStream().start()#resolution=(640,480)).start()
 time.sleep(2.0)
 
 maus = True #When it's true, cam tracks IR pen, when false, only comp mouse
-#detecting whether it is a mouse click or a mouse drag
 frame_on = 0
 
 while True:
-	#so uh... let's check the PiVideoStream...
-	#print("Henlo!")
 	image = vs.read()
 	height, width = image.shape[:2]
 	
-	#image = imutils.resize(image, width=640, height=480)
-	#print("L: [%d %d %d]" % (numpyL[0], numpyL[1], numpyL[2]))
 	hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 	pers = cv2.warpPerspective(image, wer, (640,480))	
-
 	mask = cv2.inRange(hsv, numpyL, numpyH)
-	#mask = cv2.erode(mask, None, iterations=2)
-	#mask = cv2.dilate(mask, None, iterations=4)
 	
 	if maus == True:
 		keypts = detector.detect(mask)
@@ -151,18 +148,36 @@ while True:
 			x = keypts[0].pt[0]
 			y = keypts[0].pt[1]
 			print("%d %d" % (x, y))
-			dst=np.array([0,0,1])
-			src=np.array([x,y,1])
-			cv2.perspectiveTransform(src,dst,wer)
-			#The problem is here, src+1==m.cols in fn perspectivetransofmr
+			#should test to see if they're withn screen bounds
+			if x > minx and x < maxx and y > miny and y < maxy:
+				#then you can do the transform
+				results=np.array([[int(x),int(y)],[0,0],[0,0]],dtype="float32")
+				results=np.array([results])
+				#print "-------"
+				#print "results"
+				#print results
+				#print "wer"
+				#print wer
+				bbbb = cv2.perspectiveTransform(results,wer)
+				#print "printing b-----"
+				#print bbbb
+				print "x, y: %d %d" % (bbbb[0][0][0], bbbb[0][0][1])				
+				#let's try matrixmult instead?
+				if frame_on == 0:
+					#click(int(x),int(y),width,height)
+					click(int(bbbb[0][0][0]),int(bbbb[0][0][1]),width,height)
+					frame_on = frame_on + 1
+				else: #frameson > 0
+					#drag(int(x),int(y),width,height)
+					drag(int(bbbb[0][0][0]),int(bbbb[0][0][1]),width,height)
+					frame_on = frame_on + 1
 
-			if frame_on == 0:
-				click(int(x),int(y),width,height)
-				frame_on = frame_on + 1
-			else: #frameson > 0
-				drag(int(x),int(y),width,height)
-				frame_on = frame_on + 1			
+			#dst=np.array([0,0,1])
+			#src=np.array([x,y,1])
+			#cv2.perspectiveTransform(src,dst,wer)
+			#The problem is here, src+1==m.cols in fn perspectivetransofmr
 			#this means there is a blob compared to last time
+
 		else:
 			frame_on = 0
 
