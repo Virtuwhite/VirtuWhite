@@ -37,7 +37,7 @@ white pixels in the whole video feed. Once you exit out of the program the HSV v
 `color.txt` this threshold is what is used in both point calibration as well as the main program.
 
 To exit out of the program when you are satisfied with your color calibration, click on one of the open
-windows and press `q`, `esc` or `ctrl+C' on the terminal window.
+windows and press `q`, `esc` or `ctrl+C` on the terminal window.
 
 The Theory behind **color calibration** is that you can isolate and mask out certain objects from each 
 other using color isolation. This involves masking out certain colors be entering in a certain threshold 
@@ -54,6 +54,7 @@ your main object is blue, anything else that appears a similar shade of "blue" w
 passing within the threshold. 
 Using infrared light allows you to put an infrared passing filter over your camera so that no visible 
 light is permitted to pass through while infrared can be seen, as shown below: 
+
 ![2](https://user-images.githubusercontent.com/14078865/29080679-6cfa3f52-7c2e-11e7-857d-49032a1d23ed.png)![3](https://user-images.githubusercontent.com/14078865/29080685-70610d56-7c2e-11e7-9f46-fbf9d7533815.png) 
 Using an infrared passing filter allows isolation of points to be a lot easier, as long as the room is not 
 exposed to much infrared light, such as natural light.
@@ -87,12 +88,33 @@ the same point on your desktop.
 Exitting the program is much the same as the other portions right now, by clicking a window and pressing
 `q`, `esc`, or entering the command `ctrl+C` in the terminal.
 
-*display.py* is the main cut of the program where the transformations and actual interface is performed. It
-uses `PiVideoStream.py` for it's video feed, which is a multithreaded image processor to improve FPS and increase
+`display.py is the main cut of the program where the transformations and actual interface is performed. It
+uses **PiVideoStream.py** for it's video feed, which is a multithreaded image processor to improve FPS and increase
 the processing rate of each image taken from the camera. Unfortunately, it has some downsides as well which
 will be highlighted in [Known Issues](#known-issues)
 
+((include stuff about blob detection I forgot it))
+
 ## Known Issues
+
+Quite frankly, if anyone is seriously considering taking onboard this project I would highly recommend starting
+from scratch to polish the program from the ground up, rather than try to build upon a rickety structure.
+
+Some know problems with the current setup however:
+Running with the *PiVideoStream* class sometimes brings up an error upon shutting down any program that
+utilizes the class to run (ex. display.py) due to a bug involving *Daemon Threads*. Ideally you would want
+because I'm utilizing python 2.7, daemon threads are unstable and cause errors upon shutdown where it would
+kill system threads before threads that utilize the system. After much searching I have been unable to find
+and fix the solution.
+
+Another problem that I am unable to identify is the error where **glib-gobject-critical ** g_object_unref assertion**
+appears in the terminal. It does not disrupt the program but I am unable to find the reason why it appears.
+
+There is an obvious trade-off between resolution and framerate and this program is no exception. While the
+framerate capture is decent at this point (~30fps) the sensitivity and accuracy of the pen is quite janky.
+
+Blob detection in itself is still a work in progress as I am unsure of the efficiencies of using opencv's
+blob detection library (simpleblobdetector)
 
 ## Future Development
 
