@@ -41,8 +41,9 @@ windows and press `q`, `esc` or `ctrl+C` on the terminal window.
 
 The Theory behind **color calibration** is that you can isolate and mask out certain objects from each 
 other using color isolation. This involves masking out certain colors be entering in a certain threshold 
-as seen:
+as seen: 
 ![HSVcolorcalib](https://user-images.githubusercontent.com/14078865/29080083-e168781a-7c2c-11e7-922f-236504d8cd26.png) 
+
 This particular threshold is tuned to the "color" of infrared light from an IR bulb passing through IR 
 passing film. However, in theory this can work with any very bold color choice, as long as the color is 
 different from the background.
@@ -56,6 +57,7 @@ Using infrared light allows you to put an infrared passing filter over your came
 light is permitted to pass through while infrared can be seen, as shown below: 
 
 ![2](https://user-images.githubusercontent.com/14078865/29080679-6cfa3f52-7c2e-11e7-857d-49032a1d23ed.png)![3](https://user-images.githubusercontent.com/14078865/29080685-70610d56-7c2e-11e7-9f46-fbf9d7533815.png) 
+
 Using an infrared passing filter allows isolation of points to be a lot easier, as long as the room is not 
 exposed to much infrared light, such as natural light.
 
@@ -114,7 +116,17 @@ There is an obvious trade-off between resolution and framerate and this program 
 framerate capture is decent at this point (~30fps) the sensitivity and accuracy of the pen is quite janky.
 
 Blob detection in itself is still a work in progress as I am unsure of the efficiencies of using opencv's
-blob detection library (simpleblobdetector)
+blob detection library (simpleblobdetector) or how effective it is to appropriately capture the pen point,
+as there are cases where the pen point is very obvious except it has a circle in the center where it 
+does not pass the threshold. And in these cases, it does not register as a blob because of the torus shape.
+
+File creation/reading from the text files can be improved and have no been tested on machines other than
+the raspberry pi I've been working with. The program may run into issues with read/write permissions if
+on another machine, as I have not tested the issue yet.
 
 ## Future Development
 
+Aside from a possible total reworking, some future development can include:
+`Creating an executable with a GUI.`
+`Capture the highest IR point blobs more accurately.`
+`Enable X11 Forwarding.`
