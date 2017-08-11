@@ -1,9 +1,5 @@
 #import the necessary packages
-#from __future__ import print_function
 from imutils.video.pivideostream import PiVideoStream
-#from imutils.video import FPS
-#from picamera.array import PiRGBArray
-#from picamera import PiCamera
 import argparse
 import imutils
 import time
@@ -11,48 +7,50 @@ import cv2
 import numpy as np
 from pymouse import PyMouse
 
+#this is to instantiate a mouse click/drag effect
+#and to acquire the dimensions of the screen you're working with (helps 
+#to transform the points
 m = PyMouse()
 xd, yd = m.screen_size()
 
+#to be passed into createTrackBar
 def nothing(x):
 	pass
 
-print("before soup")
+#print("before soup")
 scr=np.array([[0.,0.],[0.,0.],[0.,0.],[0.,0.]],dtype="float32")
 loc_file=open("perspective_transform.txt","r")
 strang=loc_file.readlines() #this returns a list, like ['0 0', '0 50'...]
-#I suppose this takes the first line############################here
+#I suppose this takes the first line
+
+#prase the points from perspective_transform.txt
+#stored in a numpy array (scr for screen)
 p = 0
 for i in strang:
 	soup=i.split()
 	loop=[float(soup[0]), float(soup[1])]
-	#print(i)
-	#print(soup)
-	#print(loop[0]+loop[1]) 
 	scr[p][0] += int(soup[0])
 	scr[p][1] += int(soup[1])
 	p+=1
 
 loc_file.close()
-print("aftersoup")
+#print("aftersoup")
+
 minx = min(scr[0][0],scr[1][0],scr[2][0],scr[3][0])
 maxx = max(scr[0][0],scr[1][0],scr[2][0],scr[3][0])
 miny = min(scr[0][1],scr[1][1],scr[2][1],scr[3][1])
 maxy = max(scr[0][1],scr[1][1],scr[2][1],scr[3][1])
 
-	#ordered TL, TR, BL, BR 
-#scr = np.array([
-#	[168, 78],
-#	[259,90],
-#	[154,130],
-#	[242,134]],dtype="float32")
-print(scr)
+#print(scr)
 dst = np.array([
 	[0,0],
 	[639,0],
 	[639,479],
 	[0,479]], dtype="float32")
 print(dst)
+
+#constructs the perspective transformation matrix based on the points (scr)
+#and the camera dimensions (640, 480 (dst))
 wer = cv2.getPerspectiveTransform(scr,dst)
 
 #numpyL = np.array([0,0,150])
@@ -116,9 +114,15 @@ else:
 	detector = cv2.SimpleBlobDetector_create(params)
 
 vs = PiVideoStream().start()#resolution=(640,480)).start()
+#warming up camera
 time.sleep(2.0)
 
 maus = True #When it's true, cam tracks IR pen, when false, only comp mouse
+#this feature is mostly meant for testing purposes but is a feature u should
+#be able to turn on and off
+
+#frame_on is meant to help count whether a blob detected should be treated as a
+#click or drag depending on the duration it appears in the camera frames
 frame_on = 0
 
 while True:
@@ -132,37 +136,24 @@ while True:
 	if maus == True:
 		keypts = detector.detect(mask)
 		bro = len(keypts)
-		#print("Length of kpts: %d" % bro)
-		'''for kp in  keypts:
-			cv2.circle(image, (int(kp.pt[0]), int(kp.pt[1])), int(kp.size),(0,0,255))
-			print("Locations: (%d, %d)" % (int(kp.pt[0]), int(kp.pt[1])))
-			# So with this, I need to determine whether a point is
-			# part of a drag or a click
-			translate(int(kp.pt[0]),int(kp.pt[1]), width, height)'''
-			#drag(int(kp.pt[0]),int(kp.pt[1]), width, height)
 
 		#bro is the number of keypoits there are
 		if bro > 0:
-			print("Length of kpts: %d" % bro)
-			#pt = keypts[0]
+			#unfortunately it only takes one point rather than treating
+			#2 points as separate valid entities
 			x = keypts[0].pt[0]
 			y = keypts[0].pt[1]
-			print("%d %d" % (x, y))
-			#should test to see if they're withn screen bounds
+
+			#testing if they're within the point bounds defined
+			#by the perspective_transform.txt helps avoid several
+			#checks and calcualtions
 			if x > minx and x < maxx and y > miny and y < maxy:
-				#then you can do the transform
+				#then you can apply the transform
 				results=np.array([[int(x),int(y)],[0,0],[0,0]],dtype="float32")
 				results=np.array([results])
-				#print "-------"
-				#print "results"
-				#print results
-				#print "wer"
-				#print wer
+
 				bbbb = cv2.perspectiveTransform(results,wer)
-				#print "printing b-----"
-				#print bbbb
-				print "x, y: %d %d" % (bbbb[0][0][0], bbbb[0][0][1])				
-				#let's try matrixmult instead?
+				#print "x, y: %d %d" % (bbbb[0][0][0], bbbb[0][0][1])				
 				if frame_on == 0:
 					#click(int(x),int(y),width,height)
 					click(int(bbbb[0][0][0]),int(bbbb[0][0][1]),width,height)
@@ -172,12 +163,6 @@ while True:
 					drag(int(bbbb[0][0][0]),int(bbbb[0][0][1]),width,height)
 					frame_on = frame_on + 1
 
-			#dst=np.array([0,0,1])
-			#src=np.array([x,y,1])
-			#cv2.perspectiveTransform(src,dst,wer)
-			#The problem is here, src+1==m.cols in fn perspectivetransofmr
-			#this means there is a blob compared to last time
-
 		else:
 			frame_on = 0
 
@@ -185,20 +170,18 @@ while True:
 	cv2.imshow("Mask", mask)
 	cv2.imshow("warped", pers)
 	key = cv2.waitKey(1) & 0xFF
-	#print("key: " + key)
 	if key == ord('q'):
 		break
 	elif key == ord('m'):
 		maus = not maus
+
+	#these features do not work
 	'''elif key==ord('h'):
 		print("horizontal flip!")
 		vs.hflip()
 	elif key==ord('v'):
 		print("vertical flip!")
 		vs.vflip()'''
-	#elif key == ord('c'): #c for calibrate
-		#I suppose you enter a calibration state?
-		#calibration = not calibration
 
 vs.stop()
 cv2.destroyAllWindows()
